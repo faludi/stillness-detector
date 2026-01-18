@@ -1,0 +1,1 @@
+The Stillness Detector senses presence and motion to determine if there is a person standing in front of it and whether that person is currently standing still. It is intended to provide a trigger to interactive art pieces that require stillness rather than action from the viewer. 
