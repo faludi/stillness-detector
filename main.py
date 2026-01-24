@@ -10,7 +10,7 @@ time.sleep(2) # allow usb connection on startup
 # TODO: Add logging functionality to record stillness events with timestamps
 # TODO: Add power-saving features for battery operation
 
-version = "1.0.4"
+version = "1.0.5"
 print("Stillness Detector - Version:", version)
 
 PIR_RESET_TIME = 1.5  # seconds to wait after motion detected
