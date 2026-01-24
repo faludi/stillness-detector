@@ -5,11 +5,18 @@ from vl53l1x import VL53L1X
 import time
 import sys
 
+time.sleep(2) # allow usb connection on startup
+
 # TODO: Add logging functionality to record stillness events with timestamps
 # TODO: Add power-saving features for battery operation
 
-version = "1.0.1"
+version = "1.0.4"
 print("Stillness Detector - Version:", version)
+
+PIR_RESET_TIME = 1.5  # seconds to wait after motion detected
+DISTANCE_THRESHOLD = 1300
+SETTLING_DELAY = 3
+DAMPING_INTERVAL = 10
 
 attempts = 0
 while attempts < 3:
@@ -22,26 +29,28 @@ while attempts < 3:
         print("Attempt", attempts, "to initialize VL53L1X failed:", e)
         time.sleep(1)
     if attempts == 3:    
-        print("Failed to initialize VL53L1X:", e)
+        print("Failed to initialize VL53L1X:")
         sys.exit(1)
 
 motion_sensor = Pin(3, Pin.IN)
 STATUS_LED = Pin("LED", Pin.OUT)
 STATUS_LED.value(0)
 RED = Pin(18, Pin.OUT)
-GREEN = Pin(17, Pin.OUT)
-BLUE = Pin(16, Pin.OUT)
+GREEN = Pin(19, Pin.OUT)
+BLUE = Pin(20, Pin.OUT)
 RED.value(0)
 GREEN.value(0)
 BLUE.value(0)
 
 class StillnessDetector:
-    def __init__(self, distance_threshold=1300, delay=2):
+    def __init__(self, distance_threshold=1300, delay=2, damping_interval=10):
         self.distance_threshold = distance_threshold
         self.delay = delay
         self.presence_start_time = None
         self.elapsed_time = None
         self.stillness_detected = False
+        self.movement_dampening_interval = damping_interval
+        self.last_motion_time = time.time()
 
     def is_person_detected(self, distance):
         return distance is not None and distance < self.distance_threshold
@@ -58,6 +67,7 @@ class StillnessDetector:
         if self.is_person_detected(distance):
             if self.presence_start_time is None:
                 self.presence_start_time = time.time()
+                self.last_motion_time = time.time()
                 print("Min distance threshold crossed, starting timer")
             else:
                 self.elapsed_time = time.time() - self.presence_start_time
@@ -72,10 +82,15 @@ class StillnessDetector:
                 self.stillness_detected = True
                 print("Person has been still for", self.elapsed_time, "seconds")
             else:
-                print("Person is in motion")
-                self.presence_start_time = None
-                self.elapsed_time = None
-                self.stillness_detected = False
+                if time.time() - self.last_motion_time > self.movement_dampening_interval:
+                    print("Ignoring brief motion")
+                    time.sleep(PIR_RESET_TIME) # brief pause to avoid immediate re-trigger
+                    self.last_motion_time = time.time()
+                else:
+                    print("Person is in motion")
+                    self.presence_start_time = None
+                    self.elapsed_time = None
+                    self.stillness_detected = False
     
     def set_distance_threshold(self, threshold):
         self.distance_threshold = threshold
@@ -106,7 +121,7 @@ def blink_led(pin, times, interval=0.2):
         pin.off()
         time.sleep(interval)
 
-detector = StillnessDetector(distance_threshold=1300, delay=3)
+detector = StillnessDetector(distance_threshold=DISTANCE_THRESHOLD, delay=SETTLING_DELAY, damping_interval=DAMPING_INTERVAL)
 
 # Main loop to read distance every second
 def main():
