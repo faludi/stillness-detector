@@ -10,14 +10,15 @@ time.sleep(2) # allow usb connection on startup
 # TODO: Add logging functionality to record stillness events with timestamps
 # TODO: Add power-saving features for battery operation
 
-version = "1.0.6"
+version = "1.0.7"
 print("Stillness Detector - Version:", version)
 
 PIR_RESET_TIME = 1.5  # seconds to wait after motion detected
 MAX_DISTANCE = 2000
 MIN_DISTANCE = 300
 SETTLING_DELAY = 3
-DAMPING_INTERVAL = 10
+DAMPING_INTERVAL = 5
+ALLOWABLE_DISTANCE_CHANGE = 300  # mm
 
 attempts = 0
 while attempts < 3:
@@ -53,6 +54,7 @@ class StillnessDetector:
         self.stillness_detected = False
         self.movement_dampening_interval = damping_interval
         self.last_motion_time = time.time()
+        self.start_distance = None
 
     def is_person_detected(self, distance):
         return distance is not None and self.min_distance < distance < self.max_distance
@@ -70,16 +72,17 @@ class StillnessDetector:
             if self.presence_start_time is None:
                 self.presence_start_time = time.time()
                 self.last_motion_time = time.time()
+                self.start_distance = distance
                 print("Distance threshold crossed, starting timer")
             else:
                 self.elapsed_time = time.time() - self.presence_start_time
         else:
-            self.presence_start_time = None
-            self.elapsed_time = None
-            self.stillness_detected = False
             print("Presence not detected")
-
+            self.reset()
         if self.elapsed_time is not None and self.elapsed_time > self.delay:
+            if abs(distance - self.start_distance) > ALLOWABLE_DISTANCE_CHANGE:
+                print("Significant distance change detected, resetting timer")
+                self.reset()
             if motion == 0:
                 self.stillness_detected = True
                 print("Person has been still for", self.elapsed_time, "seconds")
@@ -91,9 +94,13 @@ class StillnessDetector:
                     # time.sleep(PIR_RESET_TIME) # brief pause to avoid immediate re-trigger
                 else:
                     print("Person is in motion")
-                    self.presence_start_time = None
-                    self.elapsed_time = None
-                    self.stillness_detected = False
+                    self.reset()
+
+    def reset(self):
+        self.presence_start_time = None
+        self.elapsed_time = None
+        self.start_distance = None
+        self.stillness_detected = False
     
     def set_max_distance(self, threshold):
         self.max_distance = threshold
@@ -133,7 +140,10 @@ detector = StillnessDetector(max_distance=MAX_DISTANCE, min_distance=MIN_DISTANC
 # Main loop to read distance every second
 def main():
     while True:
-        blink_led(STATUS_LED, 1, interval=0.1)
+        if time.time() - detector.last_motion_time < DAMPING_INTERVAL:
+            blink_led(STATUS_LED, 2, interval=0.1)
+        else:
+            blink_led(STATUS_LED, 1, interval=0.2)
         distance = read_distance()
         motion_state =  motion_sensor.value()
         print("Distance (mm):", distance, "PIR State:", motion_state)
