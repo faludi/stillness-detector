@@ -4,23 +4,21 @@ from machine import Pin, I2C
 from vl53l1x import VL53L1X
 import time
 import sys
+import settings
 
 time.sleep(2) # allow usb connection on startup
 
 # TODO: Add logging functionality to record stillness events with timestamps
 # TODO: Add power-saving features for battery operation
 
-version = "1.0.9"
+version = "1.0.11"
 print("Stillness Detector - Version:", version)
 
-PIR_RESET_TIME = 1.5  # seconds to wait after motion detected
-MAX_DISTANCE = 2000
-MIN_DISTANCE = 300
-SETTLING_DELAY = 3
-DAMPING_INTERVAL = 5
-ALLOWABLE_DISTANCE_CHANGE = 300  # mm
+PIR_RESET_TIME = settings.PIR_RESET_TIME
+MAX_DISTANCE = settings.MAX_DISTANCE
+MIN_DISTANCE = settings.MIN_DISTANCE
 
-MODE = "normal"  # options: "normal", "relaxed", "strict"
+MODE = settings.MODE
 
 if MODE == "relaxed":
     SETTLING_DELAY = 3
@@ -34,6 +32,13 @@ elif MODE == "strict":
     SETTLING_DELAY = 10
     DAMPING_INTERVAL = 20
     ALLOWABLE_DISTANCE_CHANGE = 200
+elif MODE == "custom":
+    SETTLING_DELAY =  settings.SETTLING_DELAY
+    DAMPING_INTERVAL = settings.DAMPING_INTERVAL
+    ALLOWABLE_DISTANCE_CHANGE = settings.ALLOWABLE_DISTANCE_CHANGE
+else:
+    print("Invalid MODE in settings.py")
+    sys.exit(1)
 
 # Initialize I2C and Time-of-Flight sensor with retries
 attempts = 0
@@ -145,6 +150,9 @@ def read_distance():
     # Trigger measurement and read distance
     try:
         distance = time_of_flight.read()
+        if distance == 0: # impossible reading
+            print("Error: Invalid distance reading (0 mm)")
+            sys.exit(1)
         return distance
     except Exception as e:
         print("Error reading distance:", e)
