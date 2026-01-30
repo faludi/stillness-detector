@@ -99,7 +99,7 @@ class StillnessDetector:
             if abs(distance - self.start_distance) > ALLOWABLE_DISTANCE_CHANGE:
                 print("Significant distance change detected, resetting timer")
                 self.reset()
-            if self.elapsed_time > self.delay:
+            if self.elapsed_time is not None and self.elapsed_time > self.delay:
                 if motion == 0:
                     self.stillness_detected = True
                     print("Person has been still for", self.elapsed_time, "seconds")
