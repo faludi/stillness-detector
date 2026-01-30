@@ -10,7 +10,7 @@ time.sleep(2) # allow usb connection on startup
 # TODO: Add logging functionality to record stillness events with timestamps
 # TODO: Add power-saving features for battery operation
 
-version = "1.0.8"
+version = "1.0.9"
 print("Stillness Detector - Version:", version)
 
 PIR_RESET_TIME = 1.5  # seconds to wait after motion detected
@@ -20,6 +20,22 @@ SETTLING_DELAY = 3
 DAMPING_INTERVAL = 5
 ALLOWABLE_DISTANCE_CHANGE = 300  # mm
 
+MODE = "normal"  # options: "normal", "relaxed", "strict"
+
+if MODE == "relaxed":
+    SETTLING_DELAY = 3
+    DAMPING_INTERVAL = 2
+    ALLOWABLE_DISTANCE_CHANGE = 1000 
+elif MODE == "normal":
+    SETTLING_DELAY = 5
+    DAMPING_INTERVAL = 7
+    ALLOWABLE_DISTANCE_CHANGE = 300
+elif MODE == "strict":
+    SETTLING_DELAY = 10
+    DAMPING_INTERVAL = 20
+    ALLOWABLE_DISTANCE_CHANGE = 200
+
+# Initialize I2C and Time-of-Flight sensor with retries
 attempts = 0
 while attempts < 3:
     try:
@@ -69,13 +85,13 @@ class StillnessDetector:
     
     def update(self, distance, motion):
         if self.is_person_detected(distance):
-            if self.presence_start_time is None:
+            if self.presence_start_time is None: # update with info on initial detection
                 self.presence_start_time = time.time()
                 self.last_motion_time = time.time()
                 self.start_distance = distance
                 print("Distance threshold crossed, starting timer")
             else:
-                self.elapsed_time = time.time() - self.presence_start_time
+                self.elapsed_time = time.time() - self.presence_start_time # otherwise add to elapsed time
         else:
             print("Presence not detected")
             self.reset()
@@ -83,7 +99,7 @@ class StillnessDetector:
             if abs(distance - self.start_distance) > ALLOWABLE_DISTANCE_CHANGE:
                 print("Significant distance change detected, resetting timer")
                 self.reset()
-            if self.elapsed_time is not None and self.elapsed_time > self.delay:
+            if self.elapsed_time > self.delay:
                 if motion == 0:
                     self.stillness_detected = True
                     print("Person has been still for", self.elapsed_time, "seconds")
@@ -92,10 +108,14 @@ class StillnessDetector:
                         or time.time() - self.last_motion_time < PIR_RESET_TIME):
                         self.last_motion_time = time.time()
                         print("Ignoring brief motion")
-                        # time.sleep(PIR_RESET_TIME) # brief pause to avoid immediate re-trigger
                     else:
                         print("Person is in motion")
                         self.reset()
+            else:
+                if motion == 1:
+                    self.last_motion_time = time.time()
+                    print("Motion detected, resetting stillness timer")
+                    self.reset()
 
     def reset(self):
         self.presence_start_time = None
