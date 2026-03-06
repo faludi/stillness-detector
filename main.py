@@ -8,10 +8,9 @@ import settings
 
 time.sleep(2) # allow usb connection on startup
 
-# TODO: Add logging functionality to record stillness events with timestamps
-# TODO: Add power-saving features for battery operation
+# TODO: Add optional power-saving features for battery operation
 
-version = "1.0.11"
+version = "1.0.12"
 print("Stillness Detector - Version:", version)
 
 PIR_RESET_TIME = settings.PIR_RESET_TIME
@@ -55,6 +54,7 @@ while attempts < 3:
         print("Failed to initialize VL53L1X:")
         sys.exit(1)
 
+# Set up other inputs and outputs
 motion_sensor = Pin(3, Pin.IN)
 STATUS_LED = Pin("LED", Pin.OUT)
 STATUS_LED.value(0)
@@ -64,6 +64,12 @@ BLUE = Pin(20, Pin.OUT)
 RED.value(0)
 GREEN.value(0)
 BLUE.value(0)
+ABSENT_OUTPUT = Pin(7, Pin.OUT)
+PRESENT_OUTPUT = Pin(8, Pin.OUT)
+STILL_OUTPUT = Pin(9, Pin.OUT)
+ABSENT_OUTPUT.value(0)
+PRESENT_OUTPUT.value(0)
+STILL_OUTPUT.value(0)
 
 class StillnessDetector:
     def __init__(self, max_distance=1500, min_distance=50, delay=2, damping_interval=10):
@@ -78,9 +84,11 @@ class StillnessDetector:
         self.start_distance = None
 
     def is_person_detected(self, distance):
+        # Check if distance reading is valid and within thresholds
         return distance is not None and self.min_distance < distance < self.max_distance
     
     def get_status(self):
+        # Returns "still" if stillness detected, "present" if presence detected but not still, and "absent" if no presence detected
         if self.stillness_detected:
             return "still"
         elif (self.presence_start_time is not None):
@@ -89,6 +97,7 @@ class StillnessDetector:
             return "absent"
     
     def update(self, distance, motion):
+        # Main logic to update stillness status based on distance and motion readings
         if self.is_person_detected(distance):
             if self.presence_start_time is None: # update with info on initial detection
                 self.presence_start_time = time.time()
@@ -123,6 +132,7 @@ class StillnessDetector:
                     self.reset()
 
     def reset(self):
+        # Reset all timers and flags
         self.presence_start_time = None
         self.elapsed_time = None
         self.start_distance = None
@@ -137,14 +147,17 @@ class StillnessDetector:
         print("Min distance set to:", threshold)
 
     def set_delay(self, delay):
+        # Set the required stillness duration before detection is triggered
         self.delay = delay
         print("Delay set to:", delay)
 
     def get_distance(self):
+        # Get current distance reading from time-of-flight sensor
         return self.max_distance
     
     def get_motion(self):
-        return self.min_distance
+        # Get current motion state from PIR sensor
+        return motion_sensor.value()
 
 def read_distance():
     # Trigger measurement and read distance
@@ -170,32 +183,45 @@ def blink_led(pin, times, interval=0.2):
         pin.off()
         time.sleep(interval)
 
+# Initialize the stillness detector with configured parameters
 detector = StillnessDetector(max_distance=MAX_DISTANCE, min_distance=MIN_DISTANCE, delay=SETTLING_DELAY, damping_interval=DAMPING_INTERVAL)
 
 # Main loop to read distance every second
 def main():
     while True:
+        # Provide visual feedback on status LED based on recent motion activity
         if time.time() - detector.last_motion_time < DAMPING_INTERVAL:
             blink_led(STATUS_LED, 2, interval=0.1)
         else:
             blink_led(STATUS_LED, 1, interval=0.2)
+        # Read distance and motion sensor values, update stillness detector
         distance = read_distance()
         motion_state =  motion_sensor.value()
         print("Distance (mm):", distance, "PIR State:", motion_state)
         detector.update(distance, motion_state)
-
+        # Set LED and output pins based on stillness status
         if detector.get_status() == "still":
             set_led_color(0, 1, 0)  # Green for stillness detected
+            STILL_OUTPUT.value(1)
+            PRESENT_OUTPUT.value(0)
+            ABSENT_OUTPUT.value(0)
         elif detector.get_status() == "present":
             set_led_color(0, 0, 1)  # Blue for presence detected
+            STILL_OUTPUT.value(0)
+            PRESENT_OUTPUT.value(1)
+            ABSENT_OUTPUT.value(0)
         else:
             set_led_color(1, 0, 0)  # Red for no presence detected
-        time.sleep(0.5)
+            STILL_OUTPUT.value(0)
+            PRESENT_OUTPUT.value(0)
+            ABSENT_OUTPUT.value(1)
+        time.sleep(0.5) # Short delay to prevent excessive sensor reads and allow for visual feedback on status LED
 
 if __name__ == "__main__":
     try:
         main()
     except KeyboardInterrupt:
+        # Gracefully handle Ctrl+C to exit the program
         print("Program interrupted by user")
         STATUS_LED.value(0)
         RED.value(0)
