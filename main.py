@@ -10,7 +10,7 @@ time.sleep(2) # allow usb connection on startup
 
 # TODO: Add optional power-saving features for battery operation
 
-version = "1.0.12"
+version = "1.0.13"
 print("Stillness Detector - Version:", version)
 
 PIR_RESET_TIME = settings.PIR_RESET_TIME
@@ -55,7 +55,7 @@ while attempts < 3:
         sys.exit(1)
 
 # Set up other inputs and outputs
-motion_sensor = Pin(3, Pin.IN)
+motion_sensor = Pin(3, Pin.IN, Pin.PULL_DOWN)
 STATUS_LED = Pin("LED", Pin.OUT)
 STATUS_LED.value(0)
 RED = Pin(18, Pin.OUT)
@@ -118,10 +118,12 @@ class StillnessDetector:
                     self.stillness_detected = True
                     print("Person has been still for", self.elapsed_time, "seconds")
                 else:
-                    if (time.time() - self.last_motion_time > self.movement_dampening_interval 
-                        or time.time() - self.last_motion_time < PIR_RESET_TIME):
+                    if time.time() - self.last_motion_time > self.movement_dampening_interval:
                         self.last_motion_time = time.time()
+                        print(self.last_motion_time)
                         print("Ignoring brief motion")
+                    elif time.time() - self.last_motion_time < PIR_RESET_TIME:
+                        print("PIR reset time not yet elapsed, ignoring motion")
                     else:
                         print("Person is in motion")
                         self.reset()
