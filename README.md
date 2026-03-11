@@ -1,14 +1,14 @@
 The Stillness Detector senses presence and motion to determine if there is a person standing in front of it and whether that person is currently standing still. It is intended to provide a trigger to interactive art pieces that require stillness rather than action from the viewer. 
 
-Stillness Detector breadboard diagram<br>
+### Stillness Detector breadboard diagram<br>
 ![Stillness Detector breadboard diagram](images/Stillness_Detector_bb.png)
 
-Stillness Detector schematic<br>
+### Stillness Detector schematic<br>
 ![Stillness Detector schematic](images/Stillness_Detector_schem.png)
 
 
 
-Stillness Detector BOM
+### Stillness Detector BOM
 
 | Quantity | Manufacturer | Part | Description |
 | ----------- | ----------- | ----------- | ----------- |
