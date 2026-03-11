@@ -113,14 +113,14 @@ class StillnessDetector:
             if abs(distance - self.start_distance) > ALLOWABLE_DISTANCE_CHANGE:
                 print("Significant distance change detected, resetting timer")
                 self.reset()
-            if self.elapsed_time is not None and self.elapsed_time > self.delay:
+                return
+            if self.elapsed_time > self.delay:
                 if motion == 0:
                     self.stillness_detected = True
                     print("Person has been still for", self.elapsed_time, "seconds")
                 else:
                     if time.time() - self.last_motion_time > self.movement_dampening_interval:
                         self.last_motion_time = time.time()
-                        print(self.last_motion_time)
                         print("Ignoring brief motion")
                     elif time.time() - self.last_motion_time < PIR_RESET_TIME:
                         print("PIR reset time not yet elapsed, ignoring motion")
@@ -128,10 +128,11 @@ class StillnessDetector:
                         print("Person is in motion")
                         self.reset()
             else:
-                if motion == 1:
-                    self.last_motion_time = time.time()
-                    print("Motion detected, resetting stillness timer")
-                    self.reset()
+                print("Waiting for settling delay...")
+                # if motion == 1:
+                #     self.last_motion_time = time.time()
+                #     print("Motion detected, resetting stillness timer")
+                #     self.reset()
 
     def reset(self):
         # Reset all timers and flags
