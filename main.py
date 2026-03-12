@@ -10,7 +10,7 @@ time.sleep(2) # allow usb connection on startup
 
 # TODO: Add optional power-saving features for battery operation
 
-version = "1.0.13"
+version = "1.0.14"
 print("Stillness Detector - Version:", version)
 
 PIR_RESET_TIME = settings.PIR_RESET_TIME
@@ -21,7 +21,7 @@ MODE = settings.MODE
 
 if MODE == "relaxed":
     SETTLING_DELAY = 3
-    DAMPING_INTERVAL = 2
+    DAMPING_INTERVAL = 3
     ALLOWABLE_DISTANCE_CHANGE = 1000 
 elif MODE == "normal":
     SETTLING_DELAY = 5
