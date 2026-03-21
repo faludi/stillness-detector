@@ -10,7 +10,7 @@ time.sleep(2) # allow usb connection on startup
 
 # TODO: Add optional power-saving features for battery operation
 
-version = "1.0.14"
+version = "1.0.15"
 print("Stillness Detector - Version:", version)
 
 PIR_RESET_TIME = settings.PIR_RESET_TIME
@@ -60,10 +60,10 @@ STATUS_LED = Pin("LED", Pin.OUT)
 STATUS_LED.value(0)
 RED = Pin(18, Pin.OUT)
 GREEN = Pin(19, Pin.OUT)
-BLUE = Pin(20, Pin.OUT)
+YELLOW = Pin(20, Pin.OUT)
 RED.value(0)
 GREEN.value(0)
-BLUE.value(0)
+YELLOW.value(0)
 ABSENT_OUTPUT = Pin(7, Pin.OUT)
 PRESENT_OUTPUT = Pin(8, Pin.OUT)
 STILL_OUTPUT = Pin(9, Pin.OUT)
@@ -174,10 +174,10 @@ def read_distance():
         print("Error reading distance:", e)
         return None
     
-def set_led_color(r, g, b):
+def set_led_color(r, g, y):
     RED.value(r)
     GREEN.value(g)
-    BLUE.value(b)
+    YELLOW.value(y)
 
 def blink_led(pin, times, interval=0.2):
     for _ in range(times):
@@ -204,17 +204,17 @@ def main():
         detector.update(distance, motion_state)
         # Set LED and output pins based on stillness status
         if detector.get_status() == "still":
-            set_led_color(0, 1, 0)  # Green for stillness detected
+            set_led_color(1, 0, 1)  # Green for stillness detected
             STILL_OUTPUT.value(1)
             PRESENT_OUTPUT.value(0)
             ABSENT_OUTPUT.value(0)
         elif detector.get_status() == "present":
-            set_led_color(0, 0, 1)  # Blue for presence detected
+            set_led_color(1, 1, 0)  # Yellow for presence detected
             STILL_OUTPUT.value(0)
             PRESENT_OUTPUT.value(1)
             ABSENT_OUTPUT.value(0)
         else:
-            set_led_color(1, 0, 0)  # Red for no presence detected
+            set_led_color(0, 1, 1)  # Red for no presence detected
             STILL_OUTPUT.value(0)
             PRESENT_OUTPUT.value(0)
             ABSENT_OUTPUT.value(1)
@@ -227,7 +227,7 @@ if __name__ == "__main__":
         # Gracefully handle Ctrl+C to exit the program
         print("Program interrupted by user")
         STATUS_LED.value(0)
-        RED.value(0)
-        GREEN.value(0)
-        BLUE.value(0)
+        RED.value(1)
+        GREEN.value(1)
+        YELLOW.value(1)
         sys.exit(0)
