@@ -68,6 +68,17 @@ while attempts < 3:
         sys.exit(1)
 
 class HardwareInterface:
+    """
+    Manages all hardware components for the stillness detector.
+    
+    This class encapsulates the setup and control of:
+    - Motion sensor (PIR)
+    - Status LED (onboard)
+    - RGB LED indicator
+    - Digital output pins for external devices
+    
+    All LEDs are configured as active-low (0=on, 1=off).
+    """
     def __init__(self):
         self.motion_sensor = Pin(PIR_PIN, Pin.IN, Pin.PULL_DOWN)
         self.status_led = Pin(STATUS_LED_PIN, Pin.OUT)
@@ -90,7 +101,7 @@ class HardwareInterface:
         for output in self.outputs.values():
             output.value(0)
     
-    def set_rgb_led(self, red, green, yellow):
+    def set_rgy_led(self, red, green, yellow):
         self.rgb_leds["red"].value(red)
         self.rgb_leds["green"].value(green)
         self.rgb_leds["yellow"].value(yellow)
@@ -246,17 +257,17 @@ def main():
         detector.update(distance, motion_state)
         # Set LED and output pins based on stillness status
         if detector.get_status() == "still":
-            hardware.set_rgb_led(1, 0, 1)  # Green for stillness detected
+            hardware.set_rgy_led(0, 1, 0)  # Green for stillness detected
             hardware.outputs["still"].value(1)
             hardware.outputs["present"].value(0)
             hardware.outputs["absent"].value(0)
         elif detector.get_status() == "present":
-            hardware.set_rgb_led(1, 1, 0)  # Yellow for presence detected
+            hardware.set_rgy_led(0, 0, 1)  # Yellow for presence detected
             hardware.outputs["still"].value(0)
             hardware.outputs["present"].value(1)
             hardware.outputs["absent"].value(0)
         else:
-            hardware.set_rgb_led(0, 1, 1)  # Red for no presence detected
+            hardware.set_rgy_led(1, 0, 0)  # Red for no presence detected
             hardware.outputs["still"].value(0)
             hardware.outputs["present"].value(0)
             hardware.outputs["absent"].value(1)
