@@ -1,6 +1,6 @@
 # Requires time of flight sensor driver: https://github.com/drakxtwo/vl53l1x_pico
 
-from machine import Pin, I2C, PWM
+from machine import Pin, I2C
 from vl53l1x import VL53L1X
 import time
 import sys
@@ -10,7 +10,7 @@ time.sleep(2) # allow usb connection on startup
 
 # TODO: Add optional power-saving features for battery operation
 
-version = "1.0.15"
+version = "1.0.18"
 print("Stillness Detector - Version:", version)
 
 # Pin Assignments
@@ -80,7 +80,7 @@ class HardwareInterface:
     All LEDs are configured as active-low (0=on, 1=off).
     """
     def __init__(self):
-        self.motion_sensor = Pin(PIR_PIN, Pin.IN, Pin.PULL_DOWN)
+        self.motion_sensor = Pin(PIR_PIN, Pin.IN)
         self.status_led = Pin(STATUS_LED_PIN, Pin.OUT)
         self.rgb_leds = {
             "red": Pin(RED_LED_PIN, Pin.OUT),
@@ -172,6 +172,7 @@ class StillnessDetector:
         if abs(distance - self.start_distance) > ALLOWABLE_DISTANCE_CHANGE:
             print("Significant distance change detected, resetting timer")
             self.reset()
+            self._handle_initial_detection(distance)
     
     def _update_stillness_status(self, motion):
         # Clearer logic for motion/stillness determination
@@ -257,17 +258,17 @@ def main():
         detector.update(distance, motion_state)
         # Set LED and output pins based on stillness status
         if detector.get_status() == "still":
-            hardware.set_rgy_led(0, 1, 0)  # Green for stillness detected
+            hardware.set_rgy_led(1, 0, 1)  # Green for stillness detected
             hardware.outputs["still"].value(1)
             hardware.outputs["present"].value(0)
             hardware.outputs["absent"].value(0)
         elif detector.get_status() == "present":
-            hardware.set_rgy_led(0, 0, 1)  # Yellow for presence detected
+            hardware.set_rgy_led(1, 1, 0)  # Yellow for presence detected
             hardware.outputs["still"].value(0)
             hardware.outputs["present"].value(1)
             hardware.outputs["absent"].value(0)
         else:
-            hardware.set_rgy_led(1, 0, 0)  # Red for no presence detected
+            hardware.set_rgy_led(0, 1, 1)  # Red for no presence detected
             hardware.outputs["still"].value(0)
             hardware.outputs["present"].value(0)
             hardware.outputs["absent"].value(1)
