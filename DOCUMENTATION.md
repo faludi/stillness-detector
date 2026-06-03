@@ -1,56 +1,22 @@
-# Stillness Detector – Complete Documentation
+# Stillness Detector – Documentation
 
-**For beginners with basic MicroPython knowledge.** This guide explains how the Stillness Detector works, how to set it up, and how to customize it.
 
 ---
 
 ## Overview
 
-The **Stillness Detector** is an interactive sensor system that detects whether a person is present and standing still. It combines:
+The **Stillness Detector** is an interactive sensor system that detects whether a person is present and standing still. It is intended for triggering interactive art pieces or installations **only** when a viewer is standing motionless in front of the artwork. The device uses:
+
 - A **time-of-flight distance sensor** (VL53L1X) to measure distance in millimeters
 - A **passive infrared (PIR) motion sensor** to detect heat signatures
 - A **Raspberry Pi Pico 2** microcontroller to run the logic
 - **Status LEDs** and **digital outputs** to trigger external devices (art installations, lights, etc.)
 
-**Primary use case:** Trigger interactive art pieces or installations only when a viewer is standing motionless in front of the artwork.
-
 ---
 
-## Quickstart
+## Software Quickstart
 
-### Hardware Setup
-
-**Bill of Materials (BOM)**
-
-| Qty | Manufacturer | Part # | Description |
-|-----|--------------|--------|-------------|
-| 1   | Raspberry Pi | –      | Pico 2 (RP2350 microcontroller) |
-| 2   | Adafruit     | 4090   | USB Type-C Breakout Board |
-| 1   | SparkFun     | COM-9264 | RGB LED (Common Cathode) |
-| 1   | Littelfuse   | HE3351A0500 | Reed Relay, SPST-NO, 5V |
-| 1   | Adafruit     | 3967   | VL53L1X Time-of-Flight Distance Sensor |
-| 1   | Adafruit     | 189    | PIR Motion Sensor |
-| 3   | Adafruit     | 2780   | Resistor, 220Ω (for RGB LED) |
-
-### Wiring Diagram & Pinout
-
-See `images/Stillness_Detector_bb.png` and `images/Stillness_Detector_schem.png` for full wiring.
-
-**Pin Assignments (Pico 2)**
-
-| Pin | Name | Type | Purpose |
-|-----|------|------|---------|
-| GP3 | PIR Motion Sensor | Input | Digital input from PIR sensor (high = motion detected) |
-| GP4 | ToF SDA | I2C | I2C data line to VL53L1X sensor |
-| GP5 | ToF SCL | I2C | I2C clock line to VL53L1X sensor |
-| GP7 | ABSENT_OUTPUT | Output | High when nobody detected |
-| GP8 | PRESENT_OUTPUT | Output | High when person detected but not still |
-| GP9 | STILL_OUTPUT | Output | High when stillness detected |
-| GP18 | Red LED | Output | Debug: absence indicator |
-| GP19 | Green LED | Output | Debug: stillness indicator |
-| GP20 | Yellow LED | Output | Debug indicator (reserved) |
-
-**Note:** All LEDs are **active-low** (0 = on, 1 = off).
+### *See [Hardware](#hardware) section for design files*
 
 ### Installation
 
@@ -70,7 +36,7 @@ See `images/Stillness_Detector_bb.png` and `images/Stillness_Detector_schem.png`
    - Or use a serial terminal (e.g., Thonny IDE) and press Ctrl+D to reload
 
 4. **Verify:**
-   - Green LED should light up briefly on startup
+   - Green status LED should blink briefly on startup
    - Aim your hand at the distance sensor; you should see serial output with distance readings
 
 ---
@@ -288,66 +254,6 @@ def read_distance(self):
 
 ---
 
-## Annotated Example Walkthrough
-
-Let's trace a single iteration of the main loop when a person walks up, stands still, then walks away.
-
-```python
-# Iteration 1: Person approaches
-distance = time_of_flight.read_distance()  # Returns 1200 mm
-# 1200 is between MIN_DISTANCE (300) and MAX_DISTANCE (2000), so:
-person_present = True
-
-motion_detected = motion_sensor.value()  # Returns 1 (PIR sees motion)
-time_since_motion = 0.5  # seconds (they just started moving)
-
-# Since time_since_motion (0.5) < SETTLING_DELAY (5):
-state = "present"
-
-# Set outputs: PRESENT_OUTPUT = high, others = low
-outputs["absent"].value(1)   # off
-outputs["present"].value(0)  # ON ← person detected, moving
-outputs["still"].value(1)    # off
-
-time.sleep(0.1)
-
-
-# Iteration 50 (5 seconds later): Person stops moving
-distance = 1195  # Nearly same distance (damping filter helps here)
-person_present = True
-
-motion_detected = 0  # PIR no longer detects motion
-time_since_motion = 5.1  # > SETTLING_DELAY
-
-# Now we check: has distance drifted more than ALLOWABLE_DISTANCE_CHANGE?
-distance_drift = abs(1195 - 1200)  # 5 mm, well within 300 mm limit
-still_confirmed = True
-
-state = "still"
-
-# Set outputs: STILL_OUTPUT = high, others = low
-outputs["absent"].value(1)   # off
-outputs["present"].value(1)  # off
-outputs["still"].value(0)    # ON ← stillness detected!
-
-time.sleep(0.1)
-
-
-# Iteration 100 (10 seconds later): Person walks away
-distance = 2500  # Outside MAX_DISTANCE
-# 2500 > 2000, so:
-person_present = False
-
-state = "absent"
-
-# Set outputs: ABSENT_OUTPUT = high, others = low
-outputs["absent"].value(0)   # ON ← nobody here
-outputs["present"].value(1)  # off
-outputs["still"].value(1)    # off
-
-time.sleep(0.1)
-```
-
 **Key Insights**
 1. Distance measurement happens on every loop iteration (every 0.1 seconds).
 2. The state only changes after `SETTLING_DELAY` to avoid false positives.
@@ -396,7 +302,7 @@ ALLOWABLE_DISTANCE_CHANGE = 500 # Increase: more wiggle room allowed
 
 1. **Test your sensor range first:**
    - Connect to serial terminal (e.g., Thonny).
-   - Print `distance` every iteration.
+   - Observe `distance` every iteration.
    - Stand at different distances; note the readings.
    - Set `MIN_DISTANCE` and `MAX_DISTANCE` accordingly.
 
@@ -409,81 +315,6 @@ ALLOWABLE_DISTANCE_CHANGE = 500 # Increase: more wiggle room allowed
    - Shorter `SETTLING_DELAY` = faster trigger (snappier response).
    - Longer `SETTLING_DELAY` = more natural (person settles naturally).
    - 5 seconds is a good starting point.
-
----
-
-## Examples & Tutorials
-
-### Example 1: Print Sensor Readings to Serial
-
-**Goal:** Debug by seeing distance and motion values in real-time.
-
-Edit `main.py` and add a debug print in the main loop:
-
-```python
-while True:
-    distance = time_of_flight.read_distance()
-    motion = motion_sensor.value()
-    person_present = MIN_DISTANCE <= distance <= MAX_DISTANCE
-    
-    print(f"Distance: {distance} mm | Motion: {motion} | Present: {person_present}")
-    
-    # ... rest of main loop ...
-    time.sleep(0.1)
-```
-
-**Run it:**
-- Open a serial terminal (e.g., Thonny, minicom, or Arduino IDE).
-- Watch the output as you move your hand in front of the sensor.
-
----
-
-### Example 2: Change the Detection Range
-
-**Goal:** Make the detector only work at arm's length (0.5–1 meter).
-
-Edit `settings.py`:
-
-```python
-MIN_DISTANCE = 500   # 0.5 meters (millimeters)
-MAX_DISTANCE = 1000  # 1.0 meter
-```
-
-**Test it:**
-- Objects closer than 50 cm or farther than 1 m won't trigger presence.
-
----
-
-### Example 3: Fastest Possible Stillness Response
-
-**Goal:** Trigger stillness instantly (no waiting).
-
-Edit `settings.py`:
-
-```python
-MODE = 'custom'
-SETTLING_DELAY = 1           # Fastest possible
-DAMPING_INTERVAL = 2
-ALLOWABLE_DISTANCE_CHANGE = 50  # Strict
-```
-
-**Caveat:** This may cause flickering if the person moves slightly or the sensor jitters.
-
----
-
-### Learning Exercises
-
-**Exercise 1: Add a Timeout**
-- Modify `main.py` to stop outputting "still" after 30 seconds.
-- Hint: track `time_in_still_state` and reset to "absent" if it exceeds 30 seconds.
-
-**Exercise 2: Create a Custom LED Pattern**
-- Instead of just red/green, blink the RGB LED on each state change.
-- Hint: use `time.time()` to track elapsed time and toggle LED every 0.5 seconds.
-
-**Exercise 3: Log to a File**
-- Write distance and state to a file on the Pico 2's internal storage (using MicroPython's `open()`).
-- Later, download the file and analyze the data.
 
 ---
 
@@ -559,19 +390,6 @@ hw.set_output("still", 0)  # Trigger the "still" output pin
 
 ---
 
-### Configuration Constants (`settings.py`)
-
-| Constant | Type | Default | Description |
-|----------|------|---------|-------------|
-| `MODE` | str | `"normal"` | Preset mode: `"relaxed"`, `"normal"`, `"strict"`, or `"custom"` |
-| `MIN_DISTANCE` | int | 300 | Minimum detection distance (mm) |
-| `MAX_DISTANCE` | int | 2000 | Maximum detection distance (mm) |
-| `PIR_RESET_TIME` | float | 2.5 | Latching time of PIR sensor (seconds) |
-| `SETTLING_DELAY` | int | 5 | Time before stillness triggered (seconds, custom mode) |
-| `DAMPING_INTERVAL` | int | 7 | Min time between motion events (seconds, custom mode) |
-| `ALLOWABLE_DISTANCE_CHANGE` | int | 300 | Max sway before stillness lost (mm, custom mode) |
-
----
 
 ## Troubleshooting & FAQ
 
@@ -635,29 +453,6 @@ hw.set_output("still", 0)  # Trigger the "still" output pin
 
 ---
 
-### Problem: Red/Green LEDs don't light up
-
-**Possible causes:**
-1. LEDs are backwards or burned out.
-2. Current-limiting resistors are missing or too large.
-3. Active-low logic inverted (code says `0` = on, but you're sending `1`).
-
-**Debug steps:**
-1. Check polarity: RGB LED's common cathode should connect to GND; anodes to GP18/GP19/GP20 via 220Ω resistors.
-2. Test with a simple script:
-   ```python
-   from machine import Pin
-   import time
-   
-   red_led = Pin(18, Pin.OUT)
-   red_led.value(0)  # Turn on
-   time.sleep(2)
-   red_led.value(1)  # Turn off
-   ```
-3. If LED still doesn't light, try swapping the resistor or LED with a known good one.
-
----
-
 ### FAQ
 
 **Q: Can I increase the detection range to 5 meters?**
@@ -703,7 +498,48 @@ A: Yes, with modifications:
 
 ---
 
-## Appendix A: Pinout Table
+# Hardware
+
+## Appendix A: Design Files
+
+**Enclosure (CAD):**
+- File: `hardware/Stillness_Detector_Enclosure_v1.0.scad`
+- Format: OpenSCAD parametric design
+- Use: 3D print or adapt dimensions for custom housing
+
+**PCB (Circuit Design):**
+- Files: `hardware/stillness-detector.kicad_sch` (schematic), `hardware/stillness-detector.kicad_pcb` (layout)
+- Format: KiCad 8.0+
+- Use: Order custom PCBs via JLCPCB, OSH Park, or similar
+
+---
+## Appendix B: Bill of Materials (BOM)
+
+| Part | Quantity | Designation | Cost | Extended Cost | Supplier | Supplier and ref |
+| --- | --- | --- | --- | --- | --- | --- |
+| USB-C Receptacle TopMnt Horizontal | 2 | USB_C_PowerOnly | $0.60 | $1.20 | Digi-Key | 2073-USB4125-GF-A-0190CT-ND |
+| NPN transistor | 1 | MMBT3904 | $0.07 | $0.07 | Digi-Key | 4878-MMBT3904CT-ND |
+| 1206 resistor | 4 | 5.1k | $0.05 | $0.19 | Digi-Key | 311-5.10KFRCT-ND |
+| 1206 resistor | 1 | 330 | $0.01 | $0.01 | Digi-Key | 311-330FRCT-ND |
+| 1206 resistor | 3 | 220 | $0.01 | $0.03 | Digi-Key | 311-220FRCT-ND |
+| 1206 resistor | 2 | 4.7k | $0.01 | $0.02 | Digi-Key | 311-4.70KFRCT-ND |
+| MOSFET | 1 | DMG2301L | $0.16 | $0.16 | Digi-Key | DMG2301L-7DICT-ND |
+| 4-pin terminal block | 1 | Screw_Terminal_01x04 | $1.63 | $1.63 | Digi-Key | ED10563-ND |
+| Qwiic connector | 1 | Qwiic_RA | $0.42 | $0.42 | Digi-Key | 455-SM04B-SRSS-TBCT-ND |
+| 3-pin terminal block | 1 | PIR Sensor Screw_Terminal_01x03 | $1.26 | $1.26 | Digi-Key | ED10562-ND |
+| 1206 LED - yellow | 1 | LED-Y | $0.13 | $0.13 | Digi-Key | 160-1406-1-ND |
+| 1206 LED - green | 1 | LED-G | $0.09 | $0.09 | Digi-Key | 160-1456-1-ND |
+| 1206 LED - red | 1 | LED-R | $0.09 | $0.09 | Digi-Key | 160-1168-1-ND |
+| Raspberry Pi Pico 2 WH | 1 | Raspberry Pi Pico 2 WH | $8.00 | $8.00 | Digi-Key | 2648-SC1634-ND |
+| Female headers 20-pin for Pico | 2 | 20-position Female header | $0.85 | $1.70 | Digi-Key | 21601X20GSE |
+| PIR Sensor | 1 | SR602 PIR | $2.00 | $2.00 | Amazon | B0FQ4ZXRZS |
+| TOF Sensor | 1 | ACEIRMC TOF400C | $5.47 | $5.47 | Amazon | B0DC6M6G7W |
+| PIR cables | 3 | F - M | $0.12 | $0.37 | Digi-Key | 1528-1161-ND |
+| TOF cable Qwiic | 1 | Qwiic - male pins | $1.95 | $1.95 | Digi-Key | 1568-17912-ND |
+| PCB | 1 |  | $8.92 | $8.92 | OSH Park | https://oshpark.com/shared_projects/h9REVbJo |
+|  |  |  |  | $33.72 |  |  |
+
+## Appendix C: Pinout Table
 
 | Pin | Name | Direction | Purpose | Notes |
 |-----|------|-----------|---------|-------|
@@ -721,32 +557,18 @@ A: Yes, with modifications:
 
 ---
 
-## Appendix B: Design Files
 
-**Enclosure (CAD):**
-- File: `hardware/Stillness_Detector_Enclosure_v1.0.scad`
-- Format: OpenSCAD parametric design
-- Use: 3D print or adapt dimensions for custom housing
-
-**PCB (Circuit Design):**
-- Files: `hardware/stillness-detector.kicad_sch` (schematic), `hardware/stillness-detector.kicad_pcb` (layout)
-- Format: KiCad 8.0+
-- Use: Order custom PCBs via JLCPCB, OSH Park, or similar
-
----
-
-## Appendix C: License & Credits
+## Appendix D: License & Credits
 
 See [LICENSE](LICENSE) for full text.
 
 This project uses:
 - **MicroPython**: [micropython.org](https://micropython.org)
 - **VL53L1X driver**: [github.com/drakxtwo/vl53l1x_pico](https://github.com/drakxtwo/vl53l1x_pico)
-- **Adafruit sensors**: [adafruit.com](https://adafruit.com)
 
 ---
 
-## Appendix D: Contributing
+## Appendix E: Contributing
 
 To report bugs or suggest improvements:
 
