@@ -14,9 +14,15 @@ The **Stillness Detector** is an interactive sensor system that detects whether 
 
 ---
 
-## Software Quickstart
+## Hardware Quickstart
 
 ### *See [Hardware](#hardware) section for design files*
+
+1. Power the stillness detector via its USB-micro connector labled "Power"
+2. For controlling USB-C power, attach a power supply to the USB-C port marked "In", and a display device to the USB-C port marked "Out". Your display device will be powered whenever stillness is detected.
+3. For controlling external microcontrollers, attach wires to the "Data" connector. At a minimum use "GND" for common ground and "Still" for output when stillness is detected. You can also use "Absent" which will be active when no person is detected, and "Present" which will be active when a person has been detected but they are not still yet.
+
+## Software Quickstart
 
 ### Installation
 
