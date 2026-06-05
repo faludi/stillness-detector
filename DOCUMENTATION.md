@@ -24,35 +24,35 @@ The **Stillness Detector** is an interactive sensor system that detects whether 
 
 <div style="display:flex; flex-wrap:wrap; gap:1rem; justify-content:space-between;">
     <figure style="width:32%; margin:0; text-align:center;">
-        <img src="images/stillness-detector open.jpeg" style="width:100%; height:auto;">
+        <img src="images/stillness-detector open.jpeg" style="width:30%; height:auto;">
         <figcaption>Stillness Detector with lid open</figcaption>
     </figure>
     <figure style="width:32%; margin:0; text-align:center;">
-        <img src="images/stillness-detector closed.jpeg" style="width:100%; height:auto;">
+        <img src="images/stillness-detector closed.jpeg" style="width:30%; height:auto;">
         <figcaption>Stillness Detector with lid closed</figcaption>
     </figure>
     <figure style="width:32%; margin:0; text-align:center;">
-        <img src="images/stillness-detector top.jpeg" style="width:100%; height:auto;">
+        <img src="images/stillness-detector top.jpeg" style="width:30%; height:auto;">
         <figcaption>Stillness Detector top view</figcaption>
     </figure>
     <figure style="width:32%; margin:0; text-align:center;">
-        <img src="images/stillness-detector tof pir.jpeg" style="width:100%; height:auto;">
+        <img src="images/stillness-detector tof pir.jpeg" style="width:30%; height:auto;">
         <figcaption>Stillness Detector time of flight and passive infrared sensors</figcaption>
     </figure>
     <figure style="width:32%; margin:0; text-align:center;">
-        <img src="images/stillness-detector in out.jpeg" style="width:100%; height:auto;">
+        <img src="images/stillness-detector in out.jpeg" style="width:30%; height:auto;">
         <figcaption>Stillness Detector USB-C power control input &amp; output</figcaption>
     </figure>
     <figure style="width:32%; margin:0; text-align:center;">
-        <img src="images/stillness-detector data output.jpeg" style="width:100%; height:auto;">
+        <img src="images/stillness-detector data output.jpeg" style="width:30%; height:auto;">
         <figcaption>Stillness Detector data output connectors</figcaption>
     </figure>
     <figure style="width:32%; margin:0; text-align:center;">
-        <img src="images/stillness-detector power data.jpeg" style="width:100%; height:auto;">
+        <img src="images/stillness-detector power data.jpeg" style="width:30%; height:auto;">
         <figcaption>Stillness Detector power and data ports</figcaption>
     </figure>
     <figure style="width:32%; margin:0; text-align:center;">
-        <img src="images/stillness-detector sensors leds.jpeg" style="width:100%; height:auto;">
+        <img src="images/stillness-detector sensors leds.jpeg" style="width:30%; height:auto;">
         <figcaption>Stillness Detector sensor connectors and status LEDs</figcaption>
     </figure>
 </div>
