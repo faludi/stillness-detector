@@ -22,40 +22,40 @@ The **Stillness Detector** is an interactive sensor system that detects whether 
 2. For controlling USB-C power, attach a power supply to the USB-C port marked "In", and a display device to the USB-C port marked "Out". Your display device will be powered whenever stillness is detected.
 3. For controlling external microcontrollers, attach wires to the "Data" connector. At a minimum use "GND" for common ground and "Still" for output when stillness is detected. You can also use "Absent" which will be active when no person is detected, and "Present" which will be active when a person has been detected but they are not still yet.
 
-<figure>
-    <img src="images/stillness-detector open.jpeg" width="20%" height="20%">
-    <figcaption>Stillness Detector with lid open</figcaption>
-    <img src="images/stillness-detector closed.jpeg" width="20%" height="20%">
-    <figcaption>Stillness Detector with lid closed</figcaption>
-</figure>
-<figure>
-    <img src="images/stillness-detector closed.jpeg" width="20%" height="20%">
-    <figcaption>Stillness Detector with lid closed</figcaption>
-</figure>
-<figure>
-    <img src="images/stillness-detector top.jpeg" width="50%" height="50%">
-    <figcaption>Stillness Detector top view</figcaption>
-</figure>
-<figure>
-    <img src="images/stillness-detector tof pir.jpeg" width="50%" height="50%">
-    <figcaption>Stillness Detector time of flight and passive infrared sensors</figcaption>
-</figure>
-<figure>
-    <img src="images/stillness-detector in out.jpeg" width="50%" height="50%">
-    <figcaption>Stillness Detector USB-C power control input & output</figcaption>
-</figure>
-<figure>
-    <img src="images/stillness-detector data output.jpeg" width="50%" height="50%">
-    <figcaption>Stillness Detector data output connectors</figcaption>
-</figure>
-<figure>
-    <img src="images/stillness-detector power data.jpeg" width="50%" height="50%">
-    <figcaption>Stillness Detector power and data ports</figcaption>
-</figure>
-<figure>
-    <img src="images/stillness-detector sensors leds.jpeg" width="50%" height="50%">
-    <figcaption>Stillness Detector sensor connectors and status LEDs</figcaption>
-</figure>
+<div style="display:flex; flex-wrap:wrap; gap:1rem; justify-content:space-between;">
+    <figure style="width:32%; margin:0; text-align:center;">
+        <img src="images/stillness-detector open.jpeg" style="width:100%; height:auto;">
+        <figcaption>Stillness Detector with lid open</figcaption>
+    </figure>
+    <figure style="width:32%; margin:0; text-align:center;">
+        <img src="images/stillness-detector closed.jpeg" style="width:100%; height:auto;">
+        <figcaption>Stillness Detector with lid closed</figcaption>
+    </figure>
+    <figure style="width:32%; margin:0; text-align:center;">
+        <img src="images/stillness-detector top.jpeg" style="width:100%; height:auto;">
+        <figcaption>Stillness Detector top view</figcaption>
+    </figure>
+    <figure style="width:32%; margin:0; text-align:center;">
+        <img src="images/stillness-detector tof pir.jpeg" style="width:100%; height:auto;">
+        <figcaption>Stillness Detector time of flight and passive infrared sensors</figcaption>
+    </figure>
+    <figure style="width:32%; margin:0; text-align:center;">
+        <img src="images/stillness-detector in out.jpeg" style="width:100%; height:auto;">
+        <figcaption>Stillness Detector USB-C power control input &amp; output</figcaption>
+    </figure>
+    <figure style="width:32%; margin:0; text-align:center;">
+        <img src="images/stillness-detector data output.jpeg" style="width:100%; height:auto;">
+        <figcaption>Stillness Detector data output connectors</figcaption>
+    </figure>
+    <figure style="width:32%; margin:0; text-align:center;">
+        <img src="images/stillness-detector power data.jpeg" style="width:100%; height:auto;">
+        <figcaption>Stillness Detector power and data ports</figcaption>
+    </figure>
+    <figure style="width:32%; margin:0; text-align:center;">
+        <img src="images/stillness-detector sensors leds.jpeg" style="width:100%; height:auto;">
+        <figcaption>Stillness Detector sensor connectors and status LEDs</figcaption>
+    </figure>
+</div>
 
 
 ## Software Quickstart
