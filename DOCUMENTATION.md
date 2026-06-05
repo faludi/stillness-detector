@@ -25,6 +25,8 @@ The **Stillness Detector** is an interactive sensor system that detects whether 
 <figure>
     <img src="images/stillness-detector open.jpeg" width="20%" height="20%">
     <figcaption>Stillness Detector with lid open</figcaption>
+    <img src="images/stillness-detector closed.jpeg" width="20%" height="20%">
+    <figcaption>Stillness Detector with lid closed</figcaption>
 </figure>
 <figure>
     <img src="images/stillness-detector closed.jpeg" width="20%" height="20%">
