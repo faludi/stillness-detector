@@ -23,11 +23,11 @@ The **Stillness Detector** is an interactive sensor system that detects whether 
 3. For controlling external microcontrollers, attach wires to the "Data" connector. At a minimum use "GND" for common ground and "Still" for output when stillness is detected. You can also use "Absent" which will be active when no person is detected, and "Present" which will be active when a person has been detected but they are not still yet.
 
 <figure>
-    <img src="images/stillness-detector open.jpeg" width="50%" height="50%">
+    <img src="images/stillness-detector open.jpeg" width="20%" height="20%">
     <figcaption>Stillness Detector with lid open</figcaption>
 </figure>
 <figure>
-    <img src="images/stillness-detector closed.jpeg" width="50%" height="50%">
+    <img src="images/stillness-detector closed.jpeg" width="20%" height="20%">
     <figcaption>Stillness Detector with lid closed</figcaption>
 </figure>
 <figure>
