@@ -2,4 +2,4 @@ The Stillness Detector senses presence and motion to determine if there is a per
 
 See the [DOCUMENTATION](DOCUMENTATION.md) for more information.
 
-<img src="stillness-detector open.jpeg" width="50%" height="50%">
+<img src="images/stillness-detector open.jpeg" width="50%" height="50%">
