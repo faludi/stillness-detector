@@ -543,7 +543,6 @@ A: Yes, with modifications:
 | PIR cables | 3 | F - M | $0.12 | $0.37 | Digi-Key | 1528-1161-ND |
 | TOF cable Qwiic | 1 | Qwiic - male pins | $1.95 | $1.95 | Digi-Key | 1568-17912-ND |
 | PCB | 1 |  | $8.92 | $8.92 | OSH Park | https://oshpark.com/shared_projects/h9REVbJo |
-|  |  |  |  | $33.72 |  |  |
 
 ## Appendix C: Pinout Table
 
@@ -563,8 +562,16 @@ A: Yes, with modifications:
 
 ---
 
+## Appendix D: Breadboard diagram<br>
 
-## Appendix D: License & Credits
+![Stillness Detector breadboard diagram](images/Stillness_Detector_bb.png)
+
+## Appendix E: Schematic<br>
+![Stillness Detector schematic](images/Stillness_Detector_schem.png)
+
+*\* images created with Fritzing.*
+
+## Appendix F: License & Credits
 
 See [LICENSE](LICENSE) for full text.
 
@@ -574,7 +581,7 @@ This project uses:
 
 ---
 
-## Appendix E: Contributing
+## Appendix G: Contributing
 
 To report bugs or suggest improvements:
 
