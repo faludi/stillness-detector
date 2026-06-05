@@ -18,38 +18,47 @@ The **Stillness Detector** is an interactive sensor system that detects whether 
 
 ### *See [Hardware](#hardware) section for design files*
 
-1. Power the stillness detector via its USB-micro connector labled "Power"
-2. For controlling USB-C power, attach a power supply to the USB-C port marked "In", and a display device to the USB-C port marked "Out". Your display device will be powered whenever stillness is detected.
-3. For controlling external microcontrollers, attach wires to the "Data" connector. At a minimum use "GND" for common ground and "Still" for output when stillness is detected. You can also use "Absent" which will be active when no person is detected, and "Present" which will be active when a person has been detected but they are not still yet.
-
 <figure>
     <img src="images/stillness-detector open.jpeg" width="20%">
     <figcaption>Stillness Detector with lid open</figcaption>
 </figure>
+
 <figure>
     <img src="images/stillness-detector closed.jpeg" width="20%">
     <figcaption>Stillness Detector with lid closed</figcaption>
 </figure>
-<figure>
-    <img src="images/stillness-detector top.jpeg" width="20%">
-    <figcaption>Stillness Detector top view</figcaption>
-</figure>
-<figure>
-    <img src="images/stillness-detector tof pir.jpeg" width="20%">
-    <figcaption>Stillness Detector time of flight and passive infrared sensors</figcaption>
-</figure>
-<figure>
-    <img src="images/stillness-detector in out.jpeg" width="20%">
-    <figcaption>Stillness Detector USB-C power control input & output</figcaption>
-</figure>
-<figure>
-    <img src="images/stillness-detector data output.jpeg" width="20%">
-    <figcaption>Stillness Detector data output connectors</figcaption>
-</figure>
+
+1. Power the stillness detector via its USB-micro connector labled "Power"
 <figure>
     <img src="images/stillness-detector power data.jpeg" width="20%">
     <figcaption>Stillness Detector power and data ports</figcaption>
 </figure>
+
+2. For controlling USB-C power, attach a power supply to the USB-C port marked "In", and a display device to the USB-C port marked "Out". Your display device will be powered whenever stillness is detected.
+<figure>
+    <img src="images/stillness-detector in out.jpeg" width="20%">
+    <figcaption>Stillness Detector USB-C power control input & output</figcaption>
+</figure>
+
+3. For controlling external microcontrollers, attach wires to the "Data" connector. At a minimum use "GND" for common ground and "Still" for output when stillness is detected. You can also use "Absent" which will be active when no person is detected, and "Present" which will be active when a person has been detected but they are not still yet.
+<figure>
+    <img src="images/stillness-detector data output.jpeg" width="20%">
+    <figcaption>Stillness Detector data output connectors</figcaption>
+</figure>
+
+4. Orient the Stillness Detector so that that time-of-flight sensor and passive infrared sensor are pointed towards where the viewer will be standing.
+<figure>
+    <img src="images/stillness-detector tof pir.jpeg" width="20%">
+    <figcaption>Stillness Detector time of flight and passive infrared sensors</figcaption>
+</figure>
+
+Inside the Stillness Detector is a Raspberry Pi Pico 2 WH with a custom circuit board and sensors.
+<figure>
+    <img src="images/stillness-detector top.jpeg" width="20%">
+    <figcaption>Stillness Detector top view</figcaption>
+</figure>
+
+There are three output LEDs that indicate the detection state, Red when nobody is detected, yellow when a person is present but not yet still, green when they have settled and are motionless. The internal connectors for the sensors are also shown. These are useful if you want to place the sensors outside of the enclosure and need to extend the connector wires. 
 <figure>
     <img src="images/stillness-detector sensors leds.jpeg" width="20%">
     <figcaption>Stillness Detector sensor connectors and status LEDs</figcaption>
