@@ -10,7 +10,7 @@ time.sleep(2) # allow usb connection on startup
 
 # TODO: Add optional power-saving features for battery operation
 
-version = "1.0.18"
+version = "1.0.19"
 print("Stillness Detector - Version:", version)
 
 # Pin Assignments
@@ -126,7 +126,7 @@ class StillnessDetector:
         self.min_distance = min_distance
         self.delay = delay
         self.presence_start_time = None
-        self.elapsed_time = None
+        self.elapsed_time = 0
         self.stillness_detected = False
         self.movement_dampening_interval = damping_interval
         self.last_motion_time = time.time()
@@ -197,7 +197,7 @@ class StillnessDetector:
     def reset(self):
         # Reset all timers and flags
         self.presence_start_time = None
-        self.elapsed_time = None
+        self.elapsed_time = 0
         self.start_distance = None
         self.stillness_detected = False
     
