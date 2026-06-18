@@ -19,12 +19,12 @@ The **Stillness Detector** is an interactive sensor system that detects whether 
 ### *See [Hardware](#hardware) section for design files*
 
 <figure>
-    <img src="images/stillness-detector open.jpeg" width="20%">
+    <img src="images/stillness-detector open.jpeg" width="50%">
     <figcaption>Stillness Detector with lid open</figcaption>
 </figure>
 
 <figure>
-    <img src="images/stillness-detector closed.jpeg" width="20%">
+    <img src="images/stillness-detector closed.jpeg" width="50%">
     <figcaption>Stillness Detector with lid closed</figcaption>
 </figure>
 
@@ -346,6 +346,7 @@ ALLOWABLE_DISTANCE_CHANGE = 500 # Increase: more wiggle room allowed
 | `ALLOWABLE_DISTANCE_CHANGE` | mm | Max forward/backward sway before stillness lost | 100–1000 |
 | `MIN_DISTANCE` | mm | Nearest detection range (person too close = not detected) | 200–500 |
 | `MAX_DISTANCE` | mm | Farthest detection range (person too far = not detected) | 1000–3000 |
+| `PIR_RESET_TIME` | seconds | Duration of a PIR trigger (from data sheet or testing) | 1-4 |
 
 ### Tuning Tips
 
