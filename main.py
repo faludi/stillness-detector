@@ -22,6 +22,7 @@ YELLOW_LED_PIN = 20
 ABSENT_OUTPUT_PIN = 7
 PRESENT_OUTPUT_PIN = 8
 STILL_OUTPUT_PIN = 9
+USB_CONTROL_PIN = 10
 
 # LED States (for clarity)
 LED_ON = 0  # Active low
@@ -91,6 +92,7 @@ class HardwareInterface:
             "absent": Pin(ABSENT_OUTPUT_PIN, Pin.OUT),
             "present": Pin(PRESENT_OUTPUT_PIN, Pin.OUT),
             "still": Pin(STILL_OUTPUT_PIN, Pin.OUT),
+            "usb_control": Pin(USB_CONTROL_PIN, Pin.OUT),
         }
         self._initialize_all()
     
@@ -262,16 +264,20 @@ def main():
             hardware.outputs["still"].value(1)
             hardware.outputs["present"].value(0)
             hardware.outputs["absent"].value(0)
+            hardware.outputs["usb_control"].value(1)  # Activate USB control when stillness is detected
+
         elif detector.get_status() == "present":
             hardware.set_rgy_led(1, 1, 0)  # Yellow for presence detected
             hardware.outputs["still"].value(0)
             hardware.outputs["present"].value(1)
             hardware.outputs["absent"].value(0)
+            hardware.outputs["usb_control"].value(0)  # Deactivate USB control when presence is detected
         else:
             hardware.set_rgy_led(0, 1, 1)  # Red for no presence detected
             hardware.outputs["still"].value(0)
             hardware.outputs["present"].value(0)
             hardware.outputs["absent"].value(1)
+            hardware.outputs["usb_control"].value(0)  # Deactivate USB control when no presence is detected
         time.sleep(0.5) # Short delay to prevent excessive sensor reads and allow for visual feedback on status LED
 
 if __name__ == "__main__":
